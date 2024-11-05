@@ -1,7 +1,6 @@
 plugins {
-    id 'java-library'
+    id 'java'
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.7.3'
 }
 import groovy.json.JsonSlurper
 
@@ -82,44 +81,13 @@ task setup {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
+    archiveClassifier = 'sources'
     from "src/main/java"
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
+    archiveClassifier = 'javadoc'
     from javadoc.destinationDir
-}
-
-bintray {
-    user = bintrayUsername
-    key = bintrayApiKey
-    publications = ["BintrayRelease"]
-    pkg {
-        repo = 'maven'
-        name = project.name
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/MinnDevelopment/discord-rpc-release.git'
-        githubRepo = 'MinnDevelopment/discord-rpc-release'
-        publish = true
-        version {
-            name = project.version
-            vcsTag = project.version
-            released = new Date()
-            gpg {
-                sign = true
-            }
-        }
-    }
-}
-
-bintrayUpload {
-    dependsOn clean
-    dependsOn build
-    build.mustRunAfter clean
-
-    onlyIf { !getProjectProperty('bintrayUsername').empty }
-    onlyIf { !getProjectProperty('bintrayApiKey').empty }
 }
 
 def getProjectProperty(String key) {
@@ -128,7 +96,7 @@ def getProjectProperty(String key) {
 
 publishing {
     publications {
-        BintrayRelease(MavenPublication) {
+        mavenJava(MavenPublication) {
             from components.java
             groupId group
             artifactId archivesBaseName
